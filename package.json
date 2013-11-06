@@ -1,0 +1,36 @@
+{
+  "name": "fn-logger",
+  "version": "1.0.0",
+  "description": "Front end logging display for AngularJS.",
+  "main": "fn-logger.min.js",
+  "scripts": {
+    "test": "grunt build-test"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "chai-spies": "~0.5.1",
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.5",
+    "phantomjs": "~1.9.2-2",
+    "karma-script-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.3",
+    "karma-requirejs": "~0.1.0",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma": "~0.10.4",
+    "grunt-angular-templates": "~0.4.7",
+    "grunt-contrib-htmlmin": "~0.1.3",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-cssmin": "~0.6.2",
+    "grunt-include-replace": "~1.1.1",
+    "grunt-inline-content": "~0.1.3",
+    "grunt-contrib-jshint": "~0.7.0",
+    "grunt-karma": "~0.6.2",
+    "load-grunt-tasks": "~0.2.0",
+    "time-grunt": "~0.1.2"
+  }
+}
