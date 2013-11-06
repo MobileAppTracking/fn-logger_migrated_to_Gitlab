@@ -1,0 +1,88 @@
+<!doctype html>
+<html ng-app="testApp">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>fn logger test app</title>
+  <style type="text/css">
+    html, body {
+      color: #222;
+      padding: 0;
+      margin: 0;
+      font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+      position: relative;
+      line-height: 1;
+    }
+
+    header {
+      background-color: #2ba6cb;
+      padding: 15px 0;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      color: #fff;
+      text-shadow: 0 -1px 0 #000;
+      font-size: 45px;
+      margin: 0 3%;
+      padding: 0;
+      text-rendering: optimizeLegibility;
+      line-height: 1.4;
+    }
+
+    #content {
+      padding: 10px 30px;
+    }
+
+    .highlight {
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="row">
+      <h1 class="header">(fn)Logger Test Page</h1>
+    </div>
+  </header>
+
+  <div ng-controller="TestController" id="content">
+    <h2>Basic Usage</h2>
+     
+    <div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #a6e22e">$log</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">log</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&#39;test-namespace&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&#39;My Message&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">{</span><span style="color: #a6e22e">foo</span><span style="color: #f92672">:</span> <span style="color: #e6db74">&#39;bar&#39;</span><span style="color: #f8f8f2">});</span></pre></div>
+
+    <button ng-click="basicUsage()">Try Me</button>
+
+    <debugger></debugger>
+  </div>
+
+
+  <script src="bower_components/jquery/jquery.min.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+  <script src="bower_components/lodash/dist/lodash.underscore.min.js"></script>
+  <script src="bower_components/taffydb/taffy-min.js"></script>
+  <script src="fn-logger.min.js"></script>
+
+  <script>
+    angular.module('testApp', ['fn.logger']).controller('TestController', function($scope, $log) {
+
+      $scope.basicUsage = function() {
+        $log.log('test-namespace', 'My Message', {foo: 'bar'});
+      }
+
+
+      $log.warn('test');
+      $log.log('test-namespace', 'hello world1', {data : 'myData'}, ['array1', '2']);
+      console.error('console test html', $('<p>Test <b>Bold</b> end </p>'));
+      console.info('test');
+      $log.info('test');
+      $log.stopInterceptingConsole();
+      console.log('shouldn\'t log to logger');
+      $log.log('should log');
+      $log.interceptConsole();
+      console.log('restored');
+    });
+  </script>
+</body>
+</html>
