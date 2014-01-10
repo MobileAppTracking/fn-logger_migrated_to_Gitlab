@@ -26,20 +26,35 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         $scope.levels = $log.dbEnabled;
 
         if ($log.datastore) {
-          $log.datastore.settings({'onInsert': function() {
-            $scope.namespaces = $log.getNamespaces();
-            $scope.levels = $log.dbEnabled;
-            updateLogs();
+          $log.datastore.settings({
+            'onInsert' : function() {
+              $scope.namespaces = $log.getNamespaces();
+              $scope.levels = $log.dbEnabled;
+              updateLogs();
 
-            $('#newLogIndicator')
-              .removeClass()
-              .addClass(this.level)
-              .stop(true, true)
-              .fadeIn('fast')
-              .delay(250)
-              .fadeOut();
-          }});
+              $('#newLogIndicator')
+                .removeClass()
+                .addClass(this.level)
+                .stop(true, true)
+                .fadeIn('fast')
+                .delay(750)
+                .fadeOut();
+            },
+            'onUpdate': function() {
+              updateLogs();
+            },
+            'onRemove': function() {
+              updateLogs();
+            }
+          });
         }
+
+        $scope.clear = function() {
+          var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
+          var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
+
+          $log.clear(namespaces, levels);
+        };
 
         $scope.setActiveNamespace = function(namespace) {
           if (namespace == '_all') {
@@ -86,9 +101,9 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
 
         $scope.namespaceClass = function(namespace) {
           if (_.contains($scope.activeNamespaces, namespace)) {
-            return 'icon-check';
+            return 'debugger-check';
           }
-          return 'icon-check-empty';
+          return 'debugger-check-empty';
         };
 
         $scope.levelClass = function(level) {

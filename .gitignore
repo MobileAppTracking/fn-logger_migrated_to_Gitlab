@@ -8,3 +8,6 @@ History.md
 
 .tern-port
 *.orig
+
+fn.logger.template.js
+temp/

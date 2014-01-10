@@ -10,7 +10,7 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   var payloadFiles = [
-    'src/fn-logger.js',
+    'src/fn.logger.js',
     'src/logger/debugger.js',
     'fn.logger.templates.js',
   ];
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
           wrap     : true
         },
         files : {
-          'fn-logger.min.js' : payloadFiles
+          'fn.logger.min.js' : payloadFiles
         }
 
       },
@@ -93,7 +93,7 @@ module.exports = function(grunt) {
           compress : false
         },
         files : {
-          'fn-logger.js' : payloadFiles
+          'fn.logger.js' : payloadFiles
         }
       }
     },

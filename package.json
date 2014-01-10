@@ -2,7 +2,7 @@
   "name": "fn-logger",
   "version": "1.0.0",
   "description": "Front end logging display for AngularJS.",
-  "main": "fn-logger.min.js",
+  "main": "fn.logger.min.js",
   "scripts": {
     "test": "grunt build-test"
   },

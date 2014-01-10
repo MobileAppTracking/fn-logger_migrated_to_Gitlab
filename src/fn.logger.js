@@ -197,6 +197,24 @@ application.config(['$provide', function($provide) {
       };
     });
 
+    $delegate.clear = function(namespaces, levels) {
+      if (_.isNull($delegate.datastore)) {
+        return;
+      }
+
+      var query = {};
+
+      if (!_.isEmpty(namespaces)) {
+        query.namespace = namespaces;
+      }
+
+      if (!_.isEmpty(levels)) {
+        query.level = levels;
+      }
+
+      $delegate.datastore(query).remove();
+    };
+
     $delegate.getNamespaces = function() {
       if ($delegate.datastore == null) {
         return [];
