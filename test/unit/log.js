@@ -81,5 +81,65 @@
         log.getLogs('my_namespace', 'error').length.should.be.equal(0);
       });
     });
+
+    describe('clears data', function() {
+      it('clears namespace specific data', function() {
+        log.getLogs().length.should.be.equal(0);
+
+        log.log('bar', '123');
+        log.log('foo', 'abc');
+        log.log('foo', 'def');
+        log.info('foo', 'ghi');
+        log.log('baz', 'foo');
+        log.log('baz', 'foo2');
+
+        log.getLogs('foo').length.should.be.equal(3);
+        log.getLogs('baz').length.should.be.equal(2);
+        log.getLogs('bar').length.should.be.equal(1);
+        log.getLogs().length.should.be.equal(6);
+
+        log.clear(['foo', 'baz']);
+        log.getLogs().length.should.be.equal(1);
+        log.clear('bar');
+        log.getLogs().length.should.be.equal(0);
+      });
+
+      it('clears level specific data', function() {
+        log.getLogs().length.should.be.equal(0);
+
+        log.log('bar', '123');
+        log.log('foo', 'abc');
+        log.log('foo', 'def');
+        log.info('foo', 'ghi');
+        log.info('baz', 'foo');
+        log.error('baz', 'foo2');
+
+        log.getLogs(null, 'log').length.should.be.equal(3);
+        log.getLogs(null, 'info').length.should.be.equal(2);
+        log.getLogs(null, 'error').length.should.be.equal(1);
+        log.getLogs().length.should.be.equal(6);
+
+        log.clear(null, ['log', 'error']);
+        log.getLogs().length.should.be.equal(2);
+        log.clear(null, 'info');
+        log.getLogs().length.should.be.equal(0);
+      });
+
+      it('clears all data', function() {
+        log.getLogs().length.should.be.equal(0);
+
+        log.log('bar', '123');
+        log.log('foo', 'abc');
+        log.log('foo', 'def');
+        log.info('foo', 'ghi');
+        log.info('baz', 'foo');
+        log.error('baz', 'foo2');
+
+        log.getLogs().length.should.be.equal(6);
+
+        log.clear();
+        log.getLogs().length.should.be.equal(0);
+      });
+    });
   });
 }());

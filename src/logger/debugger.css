@@ -290,10 +290,10 @@
   overflow: hidden;
 }
 
-#debugger .icon-check-empty, #debugger .icon-check {
+#debugger .debugger-check-empty, #debugger .debugger-check {
   position: relative;
   display: inline-block;
-  vertical-align: top;
+  vertical-align: baseline;
   margin-right: 4px;
   width: 12px;
   height: 12px;
@@ -301,11 +301,11 @@
   border-radius: 12px;
 }
 
-#debugger .icon-check-empty {
+#debugger .debugger-check-empty {
   border-color: #909090;
 }
 
-#debugger .icon-check:before {
+#debugger .debugger-check:before {
   content: '';
   display: block;
   position: absolute;
@@ -323,7 +323,7 @@
   transform: rotate(-45deg);
 }
 
-#debugger .sidebar li:hover .icon-check:before {
+#debugger .sidebar li:hover .debugger-check:before {
   border-color: #eee;
 }
 
@@ -400,6 +400,13 @@
 }
 #debugger .level-filter li.log:hover {
   border-bottom: solid 5px #ACD86D;
+}
+
+#debugger .level-filter li.clear-data {
+  float: right;
+}
+#debugger .level-filter li.clear-data:hover {
+  border-bottom: solid 5px #999;
 }
 
 #debugger span.json-key {

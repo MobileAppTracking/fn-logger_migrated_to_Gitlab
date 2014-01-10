@@ -26,7 +26,7 @@ module.exports = function(config) {
       'bower_components/taffydb/taffy-min.js',
 
       //Project source
-      'fn-logger.min.js',
+      'fn.logger.min.js',
 
       // All Tests
       'test/unit/*.js'
