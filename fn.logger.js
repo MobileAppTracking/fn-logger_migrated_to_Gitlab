@@ -185,7 +185,7 @@
             };
             $delegate.interceptConsole();
             window.$log = $delegate;
-            return window.logger = $delegate;
+            return $delegate;
         } ]);
     } ]);
     application.directive("debugger", [ "$log", "$timeout", function($log, $timeout) {

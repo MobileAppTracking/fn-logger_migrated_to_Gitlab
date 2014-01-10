@@ -257,6 +257,6 @@ application.config(['$provide', function($provide) {
     $delegate.interceptConsole();
     window.$log = $delegate;
 
-    return window.logger = $delegate;
+    return $delegate;
   }]);
 }]);
