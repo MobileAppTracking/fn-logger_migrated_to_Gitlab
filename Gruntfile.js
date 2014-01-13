@@ -11,6 +11,7 @@ module.exports = function(grunt) {
 
   var payloadFiles = [
     'src/fn.logger.js',
+    'src/cycle.js',
     'src/logger/debugger.js',
     'fn.logger.templates.js',
   ];
@@ -95,6 +96,13 @@ module.exports = function(grunt) {
         files : {
           'fn.logger.js' : payloadFiles
         }
+      }
+    },
+
+    watch: {
+      all: {
+        files: ['src/**/*'],
+        tasks: ['default']
       }
     },
 
