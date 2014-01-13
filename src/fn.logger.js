@@ -111,7 +111,7 @@ application.config(['$provide', function($provide) {
 
       prettyPrint : function(obj) {
         var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg,
-            jsonString = JSON.stringify(obj, null, 2);
+            jsonString = JSON.stringify(JSON.decycle(obj), null, 2);
 
         if (!_.isString(jsonString)) {
           return 'undefined';
@@ -141,7 +141,7 @@ application.config(['$provide', function($provide) {
         }
 
         if (_.isObject(message)) {
-          message = JSON.stringify(message);
+          message = JSON.stringify(JSON.decycle(message));
         }
 
         if (_.contains($delegate.consoleEnabled, level)) {
