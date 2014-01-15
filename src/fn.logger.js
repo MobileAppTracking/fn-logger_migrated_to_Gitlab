@@ -48,19 +48,15 @@ application.config(['$provide', function($provide) {
       'log'   : console.log
     };
 
-    $delegate.interceptConsole = function() {
-      $delegate.console = {};
+    $delegate.interceptConsole = function interceptConsole() {
       _.each(['error', 'info', 'warn', 'log'], function(level) {
-        $delegate.console[level] = function() {
-          _old[level].apply(console, arguments);
-        };
-        console[level] = function() {
+        console[level] = function fnConsoleLogger() {
           $delegate[level].apply($delegate, _.union(['console'], _.toArray(arguments)));
         };
       });
     };
 
-    $delegate.stopInterceptingConsole = function() {
+    $delegate.stopInterceptingConsole = function stopInterceptingConsole() {
       _.each(['error', 'info', 'warn', 'log'], function(level) {
         console[level] = function() {
           _old[level].apply(console, arguments);
@@ -86,6 +82,26 @@ application.config(['$provide', function($provide) {
           } else {
             return arg.stack;
           }
+        } else if (arg.sourceURL) {
+          return arg.message + '\n' + arg.sourceURL + ':' + arg.line;
+        }
+      }
+
+      if (typeof arg == 'string') {
+        return arg.replace(/\\n/g, '\n');
+      }
+
+      return arg;
+    };
+
+    var formatShortError = function(arg) {
+      if (arg instanceof Error) {
+        if (arg.stack) {
+          var stack = arg.stack.split('\n');
+          if (!arg.message || (arg.message && stack[0].indexOf(arg.message) !== -1)) {
+            return stack[0];
+          }
+          return arg.message;
         } else if (arg.sourceURL) {
           return arg.message + '\n' + arg.sourceURL + ':' + arg.line;
         }
@@ -118,6 +134,7 @@ application.config(['$provide', function($provide) {
         }
 
         return jsonString
+          .replace(/\\n/g, '\n')
           .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
           .replace(/</g, '&lt;').replace(/>/g, '&gt;')
           .replace(jsonLine, jsonHelper.replacer);
@@ -125,37 +142,50 @@ application.config(['$provide', function($provide) {
     };
 
     _.each(['error', 'info', 'warn', 'log'], function(level) {
-      $delegate[level] = function(namespace, message) {
-        var args = [];
+      $delegate[level] = function fnLogger(namespace, message) {
+        var args = _.toArray(arguments);
+        var hasjQuery = false;
 
         if (_.isUndefined(message)) {
-          message = namespace;
-          namespace = 'default';
-          _.each([namespace, message], function(arg) {
-            args.push(formatError(arg));
-          });
-        } else {
-          _.each(arguments, function(arg) {
-            args.push(formatError(arg));
-          });
+          args[1] = message = namespace;
+          args[0] = namespace = 'default';
         }
 
+        _.each(args, function(arg, key) {
+          if (key === 1 && arg instanceof Error) {
+            args[key] = message = formatShortError(arg);
+            args.push(formatError(arg));
+          } else {
+            hasjQuery = arg instanceof jQuery ? true : hasjQuery;
+            args[key] = formatError(arg);
+          }
+        });
+
+
         if (_.isObject(message)) {
-          message = JSON.stringify(JSON.decycle(message));
+          message = formatError(JSON.stringify(JSON.decycle(message)));
         }
 
         if (_.contains($delegate.consoleEnabled, level)) {
           var logFn = _old[level] || _old.log || angular.noop;
+          var logArgs;
 
           if (logFn.apply) {
+            logArgs = _.clone(args);
+            if (hasjQuery) {
+              _.each(logArgs, function(val, key) {
+                if (val instanceof jQuery) {
+                  var text = val.text().replace(/\n^\s*\n/gm, '\n');
+                  logArgs[key] = text.length > 80 ? text.slice(0, 80) + '...' : text;
+                }
+              });
+            }
+
             // default and console are auto applied namespaces don't send them to the console
             if (_(['default', 'console']).contains(namespace)) {
-              var logArgs = _.clone(args);
               logArgs = logArgs.splice(1);
-              logFn.apply(console, logArgs);
-            } else {
-              logFn.apply(console, args);
             }
+            logFn.apply(console, logArgs);
           }
         }
 

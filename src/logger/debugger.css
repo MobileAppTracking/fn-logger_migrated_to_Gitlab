@@ -334,6 +334,7 @@
   float: right;
   padding-left: 12px;
   padding-right: 60px;
+  white-space: pre-wrap;
 }
 
 #debugger .logs li:hover .level {
