@@ -381,14 +381,22 @@
                 var inDrag = false;
                 var $element = $("#debugger");
                 var height = 175;
+                var hasLocalStorage = false;
+                if ("localStorage" in window && window.localStorage !== null) {
+                    hasLocalStorage = true;
+                    height = localStorage.debuggerHeight || height;
+                }
                 if (height > $(window).height() - 50) {
                     height = $(window).height() - 50;
                 }
-                $element.height(height);
                 resizeDebugger = function(newHeight) {
-                    $("body").css("padding-bottom", newHeight);
+                    $("body").css("padding-bottom", newHeight + "px");
                     $element.height(newHeight);
+                    if (hasLocalStorage) {
+                        localStorage.debuggerHeight = newHeight;
+                    }
                 };
+                resizeDebugger(height);
                 $element.find(".toggler").click(function() {
                     if (!inDrag) {
                         if ($element.height() > 8) {
