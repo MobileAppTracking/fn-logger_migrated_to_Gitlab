@@ -60,10 +60,10 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
                 .delay(750)
                 .fadeOut();
             },
-            'onUpdate': function() {
+            'onUpdate' : function() {
               updateLogs();
             },
-            'onRemove': function() {
+            'onRemove' : function() {
               updateLogs();
             }
           });

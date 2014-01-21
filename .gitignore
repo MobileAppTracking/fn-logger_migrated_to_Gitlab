@@ -11,3 +11,7 @@ History.md
 
 fn.logger.template.js
 temp/
+
+fn.logger.js
+
+fn.logger.min.js

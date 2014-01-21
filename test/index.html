@@ -87,6 +87,14 @@
       $log.log('should log');
       $log.interceptConsole();
       console.log('restored');
+
+      var result = $log.log('mutable-test', 'request in progress');
+      setTimeout(function() {
+        result.level = 'info';
+        result.message = 'request complete';
+        result.data.push({response: {a: '123', b: [1,2,3]}});
+        $log.update(result);
+      }, 2000);
     });
   </script>
 </body>

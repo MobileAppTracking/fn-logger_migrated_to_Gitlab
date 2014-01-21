@@ -141,5 +141,34 @@
         log.getLogs().length.should.be.equal(0);
       });
     });
+
+    describe('when updating data', function() {
+      it('log returns an object', function() {
+        var result = log.log('test', 'test message', [1,2,3], [4,5,6]);
+        result.should.have.property('level', 'log');
+        result.should.have.property('message', 'test message');
+        result.should.have.property('data').and.be.an.Array;
+        result.data.length.should.be.equal(2);
+        result.should.have.property('time').and.be.a.Date;
+        result.should.have.property('namespace', 'test');
+        result.should.have.property('id').and.be.a.Number;
+      });
+
+      it('updated data is still there when fetched', function() {
+        var result = log.log('unique', 'test message', [1,2,3], [4,5,6]);
+        var logs = log.getLogs('unique');
+        logs.length.should.be.equal(1);
+        logs[0].level.should.be.equal('log');
+        logs[0].message.should.be.equal('test message');
+
+        result.level = 'error';
+        result.message = 'updated message';
+        log.update(result);
+        logs = log.getLogs('unique');
+        logs.length.should.be.equal(1);
+        logs[0].level.should.be.equal('error');
+        logs[0].message.should.be.equal('updated message');
+      });
+    });
   });
 }());
