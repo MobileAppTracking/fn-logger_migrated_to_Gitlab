@@ -294,11 +294,16 @@
             "replace ": true,
             scope: true,
             controller: [ "$scope", "$document", function($scope, $document) {
+                var hasLocalStorage = "localStorage" in window && window.localStorage !== null;
                 var updateLogs = function() {
                     $timeout(function() {
                         var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
                         var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
                         $scope.logs = $log.getLogs(namespaces, levels);
+                        if (hasLocalStorage) {
+                            localStorage.activeNamespaces = JSON.stringify($scope.activeNamespaces);
+                            localStorage.activeLevels = JSON.stringify($scope.activeLevels);
+                        }
                     });
                 };
                 $scope.logs = [];
@@ -306,6 +311,16 @@
                 $scope.activeLevels = [ "_all" ];
                 $scope.namespaces = $log.getNamespaces();
                 $scope.levels = $log.dbEnabled;
+                if (hasLocalStorage) {
+                    try {
+                        $scope.activeLevels = JSON.parse(localStorage.getItem("activeLevels")) || $scope.activeLevels;
+                        $scope.activeNamespaces = JSON.parse(localStorage.getItem("activeNamespaces")) || $scope.activeNamespaces;
+                        $scope.namespaces = _.without(_.union($scope.activeNamespaces, $scope.namespaces), "_all");
+                    } catch (e) {
+                        $scope.activeNamespaces = [ "_all" ];
+                        $scope.activeLevels = [ "_all" ];
+                    }
+                }
                 if ($log.datastore) {
                     $log.datastore.settings({
                         onInsert: function() {
@@ -381,9 +396,7 @@
                 var inDrag = false;
                 var $element = $("#debugger");
                 var height = 175;
-                var hasLocalStorage = false;
-                if ("localStorage" in window && window.localStorage !== null) {
-                    hasLocalStorage = true;
+                if (hasLocalStorage) {
                     height = localStorage.debuggerHeight || height;
                 }
                 if (height > $(window).height() - 50) {
