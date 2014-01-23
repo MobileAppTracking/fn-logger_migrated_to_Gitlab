@@ -48,6 +48,11 @@ application.config(['$provide', function($provide) {
       'log'   : console.log
     };
 
+    var _id = 0;
+    var generateId = function () {
+      return _id++;
+    };
+
     $delegate.interceptConsole = function interceptConsole() {
       _.each(['error', 'info', 'warn', 'log'], function(level) {
         console[level] = function fnConsoleLogger() {
@@ -141,6 +146,31 @@ application.config(['$provide', function($provide) {
       }
     };
 
+    var processInsertData = function(unprocessed) {
+      var data = [];
+
+      _(unprocessed).each(function(arg) {
+        var insert;
+        if (arg instanceof jQuery) {
+          insert = {
+            data : arg.html(),
+            type : 'html'
+          };
+        } else {
+          insert = {
+            data : jsonHelper.prettyPrint(arg),
+            type : 'code'
+          };
+        }
+        if ($sce) {
+          insert.data = $sce.trustAsHtml(insert.data);
+        }
+        data.push(insert);
+      });
+
+      return data;
+    };
+
     _.each(['error', 'info', 'warn', 'log'], function(level) {
       $delegate[level] = function fnLogger(namespace, message) {
         var args = _.toArray(arguments);
@@ -196,36 +226,38 @@ application.config(['$provide', function($provide) {
 
           args = args.splice(2);
 
-          var extra = [];
-          _(args).each(function(arg) {
-            var insert = '';
-            if (arg instanceof jQuery) {
-              insert = {
-                data : arg.html(),
-                type : 'html'
-              };
-            } else {
-              insert = {
-                data : jsonHelper.prettyPrint(arg),
-                type : 'code'
-              };
-            }
-            if ($sce) {
-              insert.data = $sce.trustAsHtml(insert.data);
-            }
-            extra.push(insert);
-          });
-
-          $delegate.datastore.insert({
+          var insert = {
+            'id'        : generateId(),
             'namespace' : namespace,
             'level'     : level,
             'time'      : new Date(),
-            'message'   : message,
-            'extra'     : extra
-          });
+            'message'   : message
+          };
+
+          var insertData = _.clone(insert);
+          insertData.extra = processInsertData(args);
+
+          $delegate.datastore.insert(insertData);
+
+          insert.data = args;
+          return insert;
         }
       };
     });
+
+    $delegate.update = function(payload) {
+      if (_.isNull($delegate.datastore) ||
+          !_.has(payload, 'level') ||
+          !_.has(payload, 'id') ||
+          !_.contains($delegate.dbEnabled, payload.level)) {
+        return;
+      }
+
+      payload.time = new Date();
+      payload.extra = processInsertData(payload.data);
+
+      $delegate.datastore({id: payload.id}).update(payload);
+    };
 
     $delegate.clear = function(namespaces, levels) {
       if (_.isNull($delegate.datastore)) {
