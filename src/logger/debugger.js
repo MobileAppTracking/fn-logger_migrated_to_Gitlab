@@ -10,7 +10,13 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
     'controller' : [
       '$scope', '$document',
       function ($scope, $document) {
-        var hasLocalStorage = ('localStorage' in window && window.localStorage !== null);
+        var hasLocalStorage = false;
+        try { // hack for safari incognito
+          localStorage.setItem("storage", "");
+          localStorage.getItem("storage");
+          localStorage.removeItem("storage");
+          hasLocalStorage = true;
+        } catch(err) {}
 
         var updateLogs = function() {
           $timeout(function() {
@@ -19,8 +25,8 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
             $scope.logs = $log.getLogs(namespaces, levels);
 
             if (hasLocalStorage) {
-              localStorage.activeNamespaces = JSON.stringify($scope.activeNamespaces);
-              localStorage.activeLevels = JSON.stringify($scope.activeLevels);
+              localStorage.setItem('activeNamespaces', JSON.stringify($scope.activeNamespaces));
+              localStorage.setItem('activeLevels', JSON.stringify($scope.activeLevels));
             }
           });
         };
@@ -147,18 +153,16 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         var height = 175;
 
         if (hasLocalStorage) {
-          height = localStorage.debuggerHeight || height;
+          height = localStorage.getItem('debuggerHeight') || height;
         }
-
         if (height > $(window).height() - 50) {
           height = $(window).height() - 50;
         }
-
         resizeDebugger = function(newHeight) {
-          $('body').css('padding-bottom', newHeight + 'px');
+          $("body").css("padding-bottom", newHeight + "px");
           $element.height(newHeight);
           if (hasLocalStorage) {
-            localStorage.debuggerHeight = newHeight;
+            localStorage.setItem('debuggerHeight', newHeight);
           }
         };
 
