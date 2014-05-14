@@ -1,6 +1,6 @@
 {
   "name": "fn-logger",
-  "version": "1.0.0",
+  "version": "0.5.1",
   "authors": [
     "Josh Schumacher <joshs@hasoffers.com>",
     "Jack Morgan <jack@hasoffers.com>"
@@ -17,7 +17,7 @@
   "license": "MIT",
   "homepage": "fn-logger.github.com",
   "ignore": [
-    "**/.*",
+    "src",
     "node_modules",
     "bower_components",
     "test"
