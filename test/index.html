@@ -77,9 +77,17 @@
         $log.error('default', e);
       }
 
+      try {
+        throw "Error: Yo man!";
+      } catch (e) {
+        $log.error('default', e);
+      }
+
+      console.info('test');
       $log.warn('test'); // Categorized in 'default' namespace
       $log.log('test-namespace', 'hello world1', {data : 'myData'}, ['array1', '2']);
       console.warn('console test html', $('<p>Test <b>Bold</b> Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec ullamcorper nulla non metus auctor fringilla.</p>'));
+      console.warn('console test jquery instance', $('div >h2'));
       console.info('test');
       $log.info('test');
       $log.stopInterceptingConsole();
