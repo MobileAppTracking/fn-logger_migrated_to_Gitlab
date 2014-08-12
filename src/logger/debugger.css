@@ -403,9 +403,16 @@
   border-bottom: solid 5px #ACD86D;
 }
 
-#debugger .level-filter li.clear-data {
+#debugger .level-filter li.search-data, li.clear-data {
   float: right;
 }
+
+#debugger .level-filter li.search-data > input {
+  height: 17px;
+  border-radius: 4px;
+  outline: 0;
+}
+
 #debugger .level-filter li.clear-data:hover {
   border-bottom: solid 5px #999;
 }
