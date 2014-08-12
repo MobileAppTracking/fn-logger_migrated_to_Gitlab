@@ -14,7 +14,7 @@ Required bower packages
 
 Demo
 ----
-- Demo can be found at (http://mobileapptracking.github.io/fn-logger/)
+- Demo can be found at http://mobileapptracking.github.io/fn-logger/
 
 Getting started
 ----------------
