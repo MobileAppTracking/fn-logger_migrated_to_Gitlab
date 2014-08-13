@@ -277,6 +277,25 @@ application.config(['$provide', function($provide) {
       $delegate.datastore(query).remove();
     };
 
+    $delegate.search = function(namespaces, levels, message) {
+      if (_.isNull($delegate.datastore)) {
+        return;
+      }
+
+      var query = {};
+
+      if (!_.isEmpty(namespaces)) {
+          query.namespace = namespaces;
+      }
+
+      if (!_.isEmpty(levels)) {
+          query.level = levels;
+      }
+
+      var rows = $delegate.datastore(query).filter({message:{likenocase:message}}).get();
+      return rows;
+    };
+
     $delegate.getNamespaces = function() {
       if ($delegate.datastore == null) {
         return [];
