@@ -36,11 +36,108 @@
             $delegate.consoleEnabled = [ "error", "info", "warn", "log" ];
             $delegate.dbEnabled = [ "error", "info", "warn", "log" ];
             $delegate.datastore = null;
-            if (typeof TAFFY == "function") {
-                $delegate.datastore = TAFFY();
-            } else {
-                _old.log.apply(console, [ "TaffyDb logging disabled because TAFFY not loaded" ]);
-            }
+            /**
+             * @class fn.logger.taffyStorageWrapper
+             * A wrapper for using taffyDB storage
+             *
+             * @return {Object} A wrapper containing add, set, filter, order and remove methods
+             */
+            var taffyStorageWrapper = {
+              configure: function() {
+                if (typeof TAFFY == "function") {
+                  $delegate.datastore = TAFFY();
+                } else {
+                  _old.log.apply(console, [ "TaffyDb logging disabled because TAFFY not loaded" ]);
+                }
+              },
+              /*
+               * add the specified key/value pair to the storage
+               *
+               * @param {Object} record pointing to the key/value pair to insert
+               * @return {boolean} True on success, else false
+               * @private
+               */
+              add: function(record) {
+                if (record instanceof Object) {
+                  $delegate.datastore.insert(record);
+                  return true;
+                }
+              },
+              /*
+               * update the specified key/value pair in the storage
+               *
+               * @param {Object} query for all matching records
+               * @param {Object} new record for update
+               * @return {boolean} True on success, else false
+               * @private
+               */
+              set: function(query, record) {
+                var args = _.toArray(arguments);
+                if (_.isUndefined(record)) {
+                  args[1] = column = object;
+                  args[0] = query = {};
+                }
+                if (query instanceof Object && record instanceof Object) {
+                  $delegate.datastore(query).update(record);
+                  return true;
+                }
+              },
+              /*
+               * filter the specified key/value pair in the storage by filterObject
+               *
+               * @param {Object} query for all matching records
+               * @param {Object} filterObject pointing to key/value pair for filtering
+               * @return {Object} or {Array of objects} rows of filtering result
+               * @private
+               */
+              filter: function(query, filterObject) {
+                var args = _.toArray(arguments);
+                if (_.isUndefined(filterObject)) {
+                  args[1] = filterObject = query;
+                  args[0] = query = {};
+                }
+                if (query instanceof Object && record instanceof Object) {
+                  var rows = $delegate.datastore(query).filter(filterObject);
+                  return rows;
+                }
+              },
+              /*
+               * order the specified key/value pairs in the storage by columnname
+               *
+               * @param {Object} query for all matching records
+               * @param {String} column and sort direction
+               * @return {Object} or {Array of objects} rows ordered by specificiation
+               * @private
+               */
+              order: function(query,column) {
+                var args = _.toArray(arguments);
+                if (_.isUndefined(column)) {
+                  args[1] = column = query;
+                  args[0] = query = {};
+                }
+                if (query instanceof Object) {
+                  var rows = $delegate.datastore(query).order("column").get();
+                  return rows;
+                }
+              },
+              /*
+               * remove the specified key/value pairs in the storage
+               *
+               * @param {Object} query for all matching records to remove
+               * @return {boolean} True on success, else false
+               * @private
+               */
+               remove: function(query) {
+                if (_.isUndefined(query)) {
+                  query = {};
+                }
+                if (query instanceof Object) {
+                  $delegate.datastore(query).remove();
+                  return true;
+                }
+               }
+            };
+            taffyStorageWrapper.configure();
             var formatError = function(arg) {
                 if (arg instanceof Error) {
                     if (arg.stack) {
@@ -169,7 +266,7 @@
                         };
                         var insertData = _.clone(insert);
                         insertData.extra = processInsertData(args);
-                        $delegate.datastore.insert(insertData);
+                        taffyStorageWrapper.add(insertData);
                         insert.data = args;
                         return insert;
                     }
@@ -181,9 +278,10 @@
                 }
                 payload.time = new Date();
                 payload.extra = processInsertData(payload.data);
-                $delegate.datastore({
-                    id: payload.id
-                }).update(payload);
+                taffyStorageWrapper.set({id: payload.id}, payload);
+                // $delegate.datastore({
+                //     id: payload.id
+                // }).update(payload);
             };
             $delegate.clear = function(namespaces, levels) {
                 if (_.isNull($delegate.datastore)) {
@@ -196,7 +294,7 @@
                 if (!_.isEmpty(levels)) {
                     query.level = levels;
                 }
-                $delegate.datastore(query).remove();
+                taffyStorageWrapper.remove(query);
             };
             $delegate.getNamespaces = function() {
                 if ($delegate.datastore == null) {
@@ -215,9 +313,9 @@
                 return customLogger;
             };
             $delegate.getLogs = function(namespaces, levels) {
-                if (typeof TAFFY != "function") {
-                    throw new Error("Cannot get logs; TaffyDB logging disabled because TAFFY not loaded");
-                }
+                // if (typeof TAFFY != "function") {
+                //     throw new Error("Cannot get logs; TaffyDB logging disabled because TAFFY not loaded");
+                // }
                 var query = {};
                 if (!_.isEmpty(namespaces)) {
                     query.namespace = namespaces;
@@ -225,7 +323,7 @@
                 if (!_.isEmpty(levels)) {
                     query.level = levels;
                 }
-                var rows = $delegate.datastore(query).order("time desc").get();
+                var rows = taffyStorageWrapper.order(query, "time desc");
                 return rows;
             };
             $delegate.interceptConsole();
