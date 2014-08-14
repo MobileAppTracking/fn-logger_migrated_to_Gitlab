@@ -22,10 +22,11 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
           $timeout(function() {
             var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
             var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
-            $scope.logs = $log.getLogs(namespaces, levels);
 
             if ($scope.currentSearch) {
-              $scope.logs = $log.search(namespaces, levels, $scope.currentSearch); //return the matched logs if there is a search query
+              $scope.logs = $log.search(namespaces, levels, $scope.message); //return the matched logs if there is a search query
+            } else {
+              $scope.logs = $log.getLogs(namespaces, levels);
             }
 
             if (hasLocalStorage) {
@@ -87,9 +88,8 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         };
 
         $scope.search = function(message) {
-          $scope.currentSearch = message;
-          var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
-          var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
+          var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
+          var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
 
           $scope.logs = $log.search(namespaces, levels, message);
         };
