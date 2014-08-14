@@ -23,8 +23,8 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
             var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
             var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
 
-            if ($scope.currentSearch) {
-              $scope.logs = $log.search(namespaces, levels, $scope.message); //return the matched logs if there is a search query
+            if ($scope.searchTerm) {
+              $scope.logs = $log.search(namespaces, levels, $scope.searchTerm); //return the matched logs if there is a search query
             } else {
               $scope.logs = $log.getLogs(namespaces, levels);
             }
@@ -87,11 +87,11 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
           $log.clear(namespaces, levels);
         };
 
-        $scope.search = function(message) {
+        $scope.search = function() {
           var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
           var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
 
-          $scope.logs = $log.search(namespaces, levels, message);
+          $scope.logs = $log.search(namespaces, levels, $scope.searchTerm);
         };
 
         $scope.setActiveNamespace = function(namespace) {

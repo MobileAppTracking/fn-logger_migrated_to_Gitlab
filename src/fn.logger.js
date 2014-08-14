@@ -277,7 +277,7 @@ application.config(['$provide', function($provide) {
       $delegate.datastore(query).remove();
     };
 
-    $delegate.search = function(namespaces, levels, message) {
+    $delegate.search = function(namespaces, levels, searchTerm) {
       if (_.isNull($delegate.datastore)) {
         return;
       }
@@ -292,7 +292,7 @@ application.config(['$provide', function($provide) {
           query.level = levels;
       }
 
-      var rows = $delegate.datastore(query).filter({message:{likenocase:message}}).get();
+      var rows = $delegate.datastore(query).filter({message:{likenocase:searchTerm}}).get();
       return rows;
     };
 
