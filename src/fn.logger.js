@@ -71,12 +71,11 @@ application.config(['$provide', function($provide) {
 
     $delegate.consoleEnabled = ['error', 'info', 'warn', 'log'];
     $delegate.dbEnabled = ['error', 'info', 'warn', 'log'];
-    $delegate.datastore = null;
 
-    if (typeof TAFFY == 'function') {
-      $delegate.datastore = TAFFY();
+    if (typeof TAFFY == "function") {
+      $delegate.datastore = TaffyDBAdapter(); //pass in TaffyDBAdapter for storage
     } else {
-      _old.log.apply(console, ['TaffyDb logging disabled because TAFFY not loaded']);
+      _old.log.apply(console, [ "TaffyDb logging disabled because TAFFY not loaded" ]);
     }
 
     var formatError = function(arg) {
@@ -256,7 +255,7 @@ application.config(['$provide', function($provide) {
       payload.time = new Date();
       payload.extra = processInsertData(payload.data);
 
-      $delegate.datastore({id: payload.id}).update(payload);
+      $delegate.datastore.update({id: payload.id}, payload);
     };
 
     $delegate.clear = function(namespaces, levels) {
@@ -274,7 +273,7 @@ application.config(['$provide', function($provide) {
         query.level = levels;
       }
 
-      $delegate.datastore(query).remove();
+      $delegate.datastore.remove(query);
     };
 
     $delegate.getNamespaces = function() {
@@ -282,7 +281,7 @@ application.config(['$provide', function($provide) {
         return [];
       }
 
-      return $delegate.datastore().distinct('namespace');
+      return $delegate.datastore.distinct('namespace');
     };
 
     $delegate.getLogger = function(namespace) {
@@ -312,7 +311,7 @@ application.config(['$provide', function($provide) {
         query.level = levels;
       }
 
-      var rows = $delegate.datastore(query).order('time desc').get();
+      var rows = $delegate.datastore.order(query, 'time desc').get();
       return rows;
     };
 

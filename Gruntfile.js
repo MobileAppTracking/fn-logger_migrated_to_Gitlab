@@ -14,6 +14,7 @@ module.exports = function(grunt) {
     'src/cycle.js',
     'src/logger/debugger.js',
     'fn.logger.templates.js',
+    'src/storageAdapters/taffyDBAdapter.js',
   ];
 
   grunt.initConfig({

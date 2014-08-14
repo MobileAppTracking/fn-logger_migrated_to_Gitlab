@@ -52,7 +52,7 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         }
 
         if ($log.datastore) {
-          $log.datastore.settings({
+          $log.datastore.init({
             'onInsert' : function() {
               $scope.namespaces = $log.getNamespaces();
               $scope.levels = $log.dbEnabled;
