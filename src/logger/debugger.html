@@ -20,6 +20,7 @@
       <li ng-click="setActiveLevel('_all')" class="{{levelClass('_all')}}">All</li>
       <li ng-repeat="level in levels" ng-click="setActiveLevel(level)" class="{{levelClass(level)}}">{{level}}</li>
       <li ng-click="clear()" class="clear-data">Clear</li>
+      <li class="search-data">Search <input type="text" ng-keyup="search()" ng-model="searchTerm"/></li>
     </ul>
     <ul class="logs">
       <li bindonce
