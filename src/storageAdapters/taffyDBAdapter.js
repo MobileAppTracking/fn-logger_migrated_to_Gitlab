@@ -103,7 +103,6 @@ var TaffyDBAdapter = function() {
     }
   } else {
     throw new Error('TaffyDb logging disabled because TAFFY not loaded');
-    return null;
   }
 };
 
