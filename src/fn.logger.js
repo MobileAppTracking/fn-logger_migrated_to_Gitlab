@@ -72,11 +72,7 @@ application.config(['$provide', function($provide) {
     $delegate.consoleEnabled = ['error', 'info', 'warn', 'log'];
     $delegate.dbEnabled = ['error', 'info', 'warn', 'log'];
 
-    if (typeof TAFFY == "function") {
-      $delegate.datastore = TaffyDBAdapter(); //pass in TaffyDBAdapter for storage
-    } else {
-      _old.log.apply(console, [ "TaffyDb logging disabled because TAFFY not loaded" ]);
-    }
+    $delegate.datastore = TaffyDBAdapter(); //pass in TaffyDBAdapter for storagge
 
     var formatError = function(arg) {
       if (arg instanceof Error) {
@@ -297,10 +293,6 @@ application.config(['$provide', function($provide) {
     };
 
     $delegate.getLogs = function(namespaces, levels) {
-      if (typeof TAFFY != 'function') {
-        throw new Error('Cannot get logs; TaffyDB logging disabled because TAFFY not loaded');
-      }
-
       var query = {};
 
       if (!_.isEmpty(namespaces)) {
