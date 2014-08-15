@@ -39,7 +39,7 @@ application.config(['$provide', function($provide) {
     return $sce = $delegate;
   }]);
 
-  $provide.decorator('$log', ['$delegate', function($delegate) {
+  $provide.decorator('$log', ['$delegate', 'TaffyDBAdapter', function($delegate, TaffyDBAdapter) {
     var console = window.console || {};
     var _old = {
       'error' : console.error,
@@ -72,7 +72,7 @@ application.config(['$provide', function($provide) {
     $delegate.consoleEnabled = ['error', 'info', 'warn', 'log'];
     $delegate.dbEnabled = ['error', 'info', 'warn', 'log'];
 
-    $delegate.datastore = TaffyDBAdapter(); //pass in TaffyDBAdapter for storagge
+    $delegate.datastore = TaffyDBAdapter; //pass in TaffyDBAdapter for storagge
 
     var formatError = function(arg) {
       if (arg instanceof Error) {

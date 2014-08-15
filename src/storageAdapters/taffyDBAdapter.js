@@ -1,15 +1,15 @@
 /**
   * @class fn.logger.taffyStorageWrapper
-  * A wrapper for using taffyDB storage
+  * A taffyDB storage adapter service
   *
-  * @return {Object} A wrapper containing init, set, get, filter, and remove methods
+  * @return {Object} A service instance containing init, set, get, filter, and remove methods, else null
   */
-var TaffyDBAdapter = function() {
+application.factory('TaffyDBAdapter', function() {
   /*
    * create a new empty taffyDB
    */
   if (typeof TAFFY == 'function') {
-    this.taffyDB = new TAFFY();
+    var taffyDB = new TAFFY();
     return {
 
       /*
@@ -100,9 +100,10 @@ var TaffyDBAdapter = function() {
       distinct: function(columns) {
         return taffyDB().distinct(columns);
       }
-    }
+    };
   } else {
     throw new Error('TaffyDb logging disabled because TAFFY not loaded');
+    return null;
   }
-};
+});
 
