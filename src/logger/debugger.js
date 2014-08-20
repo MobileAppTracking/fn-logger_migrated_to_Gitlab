@@ -51,29 +51,29 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
           }
         }
 
-        if ($log.datastore) {
-          $log.datastore.init({
-            'onInsert' : function() {
-              $scope.namespaces = $log.getNamespaces();
-              $scope.levels = $log.dbEnabled;
-              updateLogs();
+        // if ($log.datastore) {
+        //   $log.datastore.init({
+        //     'onInsert' : function() {
+        //       $scope.namespaces = $log.getNamespaces();
+        //       $scope.levels = $log.dbEnabled;
+        //       updateLogs();
 
-              $('#newLogIndicator')
-                .removeClass()
-                .addClass(this.level)
-                .stop(true, true)
-                .fadeIn('fast')
-                .delay(750)
-                .fadeOut();
-            },
-            'onUpdate' : function() {
-              updateLogs();
-            },
-            'onRemove' : function() {
-              updateLogs();
-            }
-          });
-        }
+        //       $('#newLogIndicator')
+        //         .removeClass()
+        //         .addClass(this.level)
+        //         .stop(true, true)
+        //         .fadeIn('fast')
+        //         .delay(750)
+        //         .fadeOut();
+        //     },
+        //     'onUpdate' : function() {
+        //       updateLogs();
+        //     },
+        //     'onRemove' : function() {
+        //       updateLogs();
+        //     }
+        //   });
+        // }
 
         $scope.clear = function() {
           var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;

@@ -65,7 +65,7 @@
   <script src="../fn.logger.js"></script>
 
   <script>
-    angular.module('testApp', ['fn.logger']).controller('TestController', function($scope, $log) {
+    angular.module('testApp', ['fn.logger']).controller('TestController', function($scope, $log, $timeout) {
 
       $scope.basicUsage = function() {
         $log.log('test-namespace', 'My Message', {foo: 'bar'});
@@ -89,7 +89,7 @@
       console.log('restored');
 
       var result = $log.log('mutable-test', 'request in progress');
-      setTimeout(function() {
+      $timeout(function() {
         result.level = 'info';
         result.message = 'request complete';
         result.data.push({response: {a: '123', b: [1,2,3]}});
