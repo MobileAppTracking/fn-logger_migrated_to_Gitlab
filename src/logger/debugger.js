@@ -57,7 +57,7 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         //       $scope.namespaces = $log.getNamespaces();
         //       $scope.levels = $log.dbEnabled;
         //       updateLogs();
-
+        //
         //       $('#newLogIndicator')
         //         .removeClass()
         //         .addClass(this.level)
@@ -78,8 +78,8 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         $scope.clear = function() {
           var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
           var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
-
           $log.clear(namespaces, levels);
+          updateLogs();
         };
 
         $scope.setActiveNamespace = function(namespace) {
@@ -140,7 +140,6 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
         };
 
         updateLogs();
-
 
         /*
          * The following code is a naive approach to handing resizing. Feel free to clean it up or isolate it out.

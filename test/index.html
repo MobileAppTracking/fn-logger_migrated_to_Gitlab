@@ -67,26 +67,29 @@
   <script>
     angular.module('testApp', ['fn.logger']).controller('TestController', function($scope, $log, $timeout) {
 
-      $scope.basicUsage = function() {
-        $log.log('test-namespace', 'My Message', {foo: 'bar'});
-      }
+      $scope.$watch($log, function(){
+        $scope.basicUsage = function() {
+          $log.log('test-namespace', 'My Message', {foo: 'bar'});
+        }
 
-      try {
-        throw new Error('Yo man!');
-      } catch (e) {
-        $log.error('default', e);
-      }
+        try {
+          throw new Error('Yo man!');
+        } catch (e) {
+          $log.error('default', e);
+        }
 
-      $log.warn('test'); // Categorized in 'default' namespace
-      $log.log('test-namespace', 'hello world1', {data : 'myData'}, ['array1', '2']);
-      console.warn('console test html', $('<p>Test <b>Bold</b> Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec ullamcorper nulla non metus auctor fringilla.</p>'));
-      console.info('test');
-      $log.info('test');
-      $log.stopInterceptingConsole();
-      console.log('shouldn\'t log to logger');
-      $log.log('should log');
-      $log.interceptConsole();
-      console.log('restored');
+        $log.warn('test'); // Categorized in 'default' namespace
+        $log.log('test-namespace', 'hello world1', {data : 'myData'}, ['array1', '2']);
+        console.warn('console test html', $('<p>Test <b>Bold</b> Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec ullamcorper nulla non metus auctor fringilla.</p>  '));
+        console.info('test');
+        $log.info('test');
+        $log.stopInterceptingConsole();
+        console.log('shouldn\'t log to logger');
+        $log.log('should log');
+        $log.interceptConsole();
+        console.log('restored');
+      });
+
 
       var result = $log.log('mutable-test', 'request in progress');
       $timeout(function() {
