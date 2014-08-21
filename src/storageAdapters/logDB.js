@@ -20,15 +20,12 @@ angular.module('fn.logger').provider('logDB', function() {
    * create record to the storage
    *
    * @param {Object} record The record to insert
-   * @return {Array} results The matched rows including the inserted record based on hte current query
+   * @return {boolean} True on success, else false
    */
 
   this.create = function(record) {
     db.push(record);
-    if (_.contains(_.pluck(results, 'namespace'), record.namespace) && _.contains(_.pluck(results, 'level'), record.level)) {
-      results.push(record);
-      return results;
-    }
+    return true;
   }
 
   /*
@@ -39,10 +36,6 @@ angular.module('fn.logger').provider('logDB', function() {
    */
 
   this.read = function(query) {
-    if (_.isUndefined(query)) {
-      return db;
-    }
-
     results =  _.filter(db, function(record) {
       for (var key in query) {
         if (!_.contains(query[key], record[key])) {
@@ -83,8 +76,6 @@ angular.module('fn.logger').provider('logDB', function() {
     _.each (results, function(result) {
       db.splice(_.indexOf(db, result), 1);
     });
-
-    results.length = 0;
 
     return true;
   }

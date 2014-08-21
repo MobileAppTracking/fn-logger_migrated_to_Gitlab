@@ -10,15 +10,9 @@
         };
         this.create = function(record) {
             db.push(record);
-            if (_.contains(_.pluck(results, "namespace"), record.namespace) && _.contains(_.pluck(results, "level"), record.level)) {
-                results.push(record);
-                return results;
-            }
+            return true;
         };
         this.read = function(query) {
-            if (_.isUndefined(query)) {
-                return db;
-            }
             results = _.filter(db, function(record) {
                 for (var key in query) {
                     if (!_.contains(query[key], record[key])) {
@@ -42,7 +36,6 @@
             _.each(results, function(result) {
                 db.splice(_.indexOf(db, result), 1);
             });
-            results.length = 0;
             return true;
         };
         this.getNameSpaces = function() {
@@ -395,6 +388,7 @@
                     var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
                     var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
                     $log.clear(namespaces, levels);
+                    updateLogs();
                 };
                 $scope.setActiveNamespace = function(namespace) {
                     if (namespace == "_all") {
