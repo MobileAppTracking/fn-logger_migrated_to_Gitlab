@@ -12,9 +12,7 @@ angular.module('fn.logger').provider('logDB', function() {
    * set storage configuration
    */
 
-  this.init = function() {
-    return;
-  }
+  this.init = angular.noop();
 
   /*
    * create record to the storage

@@ -5,9 +5,7 @@
         var db = [];
         var results = [];
         var self = this;
-        this.init = function() {
-            return;
-        };
+        this.init = angular.noop();
         this.create = function(record) {
             db.push(record);
             return true;
