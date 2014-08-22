@@ -3,25 +3,19 @@
     var application = angular.module("fn.logger", []);
     angular.module("fn.logger").provider("logDB", function() {
         this.db = [];
-        var currentResults = [];
-        var prevResults = [];
+        var results = [];
+        var currentQuery = {};
         this.init = angular.noop();
         this.create = function(record) {
             this.db.push(record);
-            if (currentResults.length == 0) {
-                var activeNameSpaces = _.pluck(prevResults, "namespace");
-                var activeLevels = _.pluck(prevResults, "level");
-            } else {
-                activeNameSpaces = _.pluck(currentResults, "namespace");
-                activeLevels = _.pluck(currentResults, "level");
-            }
-            if (_.contains(activeNameSpaces, record.namespace) && _.contains(activeLevels, record.level)) {
-                currentResults.push(record);
+            if (_.isEmpty(currentQuery) || _.contains(currentQuery.namespace, record.namespace) || _.contains(currentQuery.level, record.level)) {
+                results.push(record);
             }
             return true;
         };
         this.read = function(query) {
-            currentResults = _.filter(this.db, function(record) {
+            currentQuery = query;
+            results = _.filter(this.db, function(record) {
                 for (var key in query) {
                     if (!_.contains(query[key], record[key])) {
                         return false;
@@ -29,8 +23,8 @@
                 }
                 return true;
             });
-            currentResults = _.sortBy(currentResults, "time");
-            return currentResults;
+            results = _.sortBy(results, "time");
+            return results;
         };
         this.update = function(id, payload) {
             _.each(this.db, function(record) {
@@ -42,8 +36,7 @@
         };
         this.delete = function() {
             var db = this.db;
-            prevResults = _.clone(currentResults);
-            _.each(currentResults, function(result) {
+            _.each(results, function(result) {
                 db.splice(_.indexOf(db, result), 1);
             });
             return true;
