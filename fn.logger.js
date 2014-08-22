@@ -1,7 +1,52 @@
 (function(exports, global) {
     global["true"] = exports;
     var application = angular.module("fn.logger", []);
-    application.config([ "$provide", function($provide) {
+    angular.module("fn.logger").provider("logDB", function() {
+        var db = [];
+        var results = [];
+        var self = this;
+        this.init = function() {
+            return;
+        };
+        this.create = function(record) {
+            db.push(record);
+            return true;
+        };
+        this.read = function(query) {
+            results = _.filter(db, function(record) {
+                for (var key in query) {
+                    if (!_.contains(query[key], record[key])) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            results = _.sortBy(results, "time");
+            return results;
+        };
+        this.update = function(id, payload) {
+            _.each(db, function(record) {
+                if (record.id == id) {
+                    record = _.extend(record, payload);
+                }
+            });
+            return true;
+        };
+        this.delete = function() {
+            _.each(results, function(result) {
+                db.splice(_.indexOf(db, result), 1);
+            });
+            return true;
+        };
+        this.getNameSpaces = function() {
+            var values = _.pluck(db, "namespace");
+            return _.uniq(values);
+        };
+        this.$get = function() {
+            return self;
+        };
+    });
+    angular.module("fn.logger").config([ "$provide", "logDBProvider", function($provide, logDBProvider) {
         "use strict";
         var $sce;
         $provide.decorator("$sce", [ "$delegate", function($delegate) {
@@ -35,12 +80,7 @@
             };
             $delegate.consoleEnabled = [ "error", "info", "warn", "log" ];
             $delegate.dbEnabled = [ "error", "info", "warn", "log" ];
-            $delegate.datastore = null;
-            if (typeof TAFFY == "function") {
-                $delegate.datastore = TAFFY();
-            } else {
-                _old.log.apply(console, [ "TaffyDb logging disabled because TAFFY not loaded" ]);
-            }
+            $delegate.datastore = logDBProvider;
             var formatError = function(arg) {
                 if (arg instanceof Error) {
                     if (arg.stack) {
@@ -169,7 +209,7 @@
                         };
                         var insertData = _.clone(insert);
                         insertData.extra = processInsertData(args);
-                        $delegate.datastore.insert(insertData);
+                        $delegate.datastore.create(insertData);
                         insert.data = args;
                         return insert;
                     }
@@ -181,46 +221,19 @@
                 }
                 payload.time = new Date();
                 payload.extra = processInsertData(payload.data);
-                $delegate.datastore({
-                    id: payload.id
-                }).update(payload);
+                $delegate.datastore.update(payload.id, payload);
             };
-            $delegate.clear = function(namespaces, levels) {
+            $delegate.clear = function() {
                 if (_.isNull($delegate.datastore)) {
                     return;
                 }
-                var query = {};
-                if (!_.isEmpty(namespaces)) {
-                    query.namespace = namespaces;
-                }
-                if (!_.isEmpty(levels)) {
-                    query.level = levels;
-                }
-                $delegate.datastore(query).remove();
-            };
-            $delegate.search = function(namespaces, levels, searchTerm) {
-                if (_.isNull($delegate.datastore)) {
-                    return;
-                }
-                var query = {};
-                if (!_.isEmpty(namespaces)) {
-                    query.namespace = namespaces;
-                }
-                if (!_.isEmpty(levels)) {
-                    query.level = levels;
-                }
-                var rows = $delegate.datastore(query).filter({
-                    message: {
-                        likenocase: searchTerm
-                    }
-                }).get();
-                return rows;
+                $delegate.datastore.delete();
             };
             $delegate.getNamespaces = function() {
                 if ($delegate.datastore == null) {
                     return [];
                 }
-                return $delegate.datastore().distinct("namespace");
+                return $delegate.datastore.getNameSpaces();
             };
             $delegate.getLogger = function(namespace) {
                 var customLogger = {};
@@ -232,10 +245,7 @@
                 });
                 return customLogger;
             };
-            $delegate.getLogs = function(namespaces, levels) {
-                if (typeof TAFFY != "function") {
-                    throw new Error("Cannot get logs; TaffyDB logging disabled because TAFFY not loaded");
-                }
+            $delegate.getLogs = function(namespaces, levels, searchTerms) {
                 var query = {};
                 if (!_.isEmpty(namespaces)) {
                     query.namespace = namespaces;
@@ -243,7 +253,10 @@
                 if (!_.isEmpty(levels)) {
                     query.level = levels;
                 }
-                var rows = $delegate.datastore(query).order("time desc").get();
+                if (!_.isEmpty(searchTerms)) {
+                    query.message = searchTerms;
+                }
+                var rows = $delegate.datastore.read(query);
                 return rows;
             };
             $delegate.interceptConsole();
@@ -345,11 +358,11 @@
                     $timeout(function() {
                         var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
                         var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
+                        var searchTerms = [];
                         if ($scope.searchTerm) {
-                            $scope.logs = $log.search(namespaces, levels, $scope.searchTerm);
-                        } else {
-                            $scope.logs = $log.getLogs(namespaces, levels);
+                            searchTerms.push($scope.searchTerm);
                         }
+                        $scope.logs = $log.getLogs(namespaces, levels, searchTerms);
                         if (hasLocalStorage) {
                             localStorage.setItem("activeNamespaces", JSON.stringify($scope.activeNamespaces));
                             localStorage.setItem("activeLevels", JSON.stringify($scope.activeLevels));
@@ -371,31 +384,12 @@
                         $scope.activeLevels = [ "_all" ];
                     }
                 }
-                if ($log.datastore) {
-                    $log.datastore.settings({
-                        onInsert: function() {
-                            $scope.namespaces = $log.getNamespaces();
-                            $scope.levels = $log.dbEnabled;
-                            updateLogs();
-                            $("#newLogIndicator").removeClass().addClass(this.level).stop(true, true).fadeIn("fast").delay(750).fadeOut();
-                        },
-                        onUpdate: function() {
-                            updateLogs();
-                        },
-                        onRemove: function() {
-                            updateLogs();
-                        }
-                    });
-                }
                 $scope.clear = function() {
-                    var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
-                    var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
-                    $log.clear(namespaces, levels);
+                    $log.clear();
+                    updateLogs();
                 };
                 $scope.search = function() {
-                    var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
-                    var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
-                    $scope.logs = $log.search(namespaces, levels, $scope.searchTerm);
+                    updateLogs();
                 };
                 $scope.setActiveNamespace = function(namespace) {
                     if (namespace == "_all") {

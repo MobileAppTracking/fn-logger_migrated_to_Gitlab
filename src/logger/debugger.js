@@ -22,12 +22,13 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
           $timeout(function() {
             var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
             var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
+            var searchTerms = [];
 
             if ($scope.searchTerm) {
-              $scope.logs = $log.search(namespaces, levels, $scope.searchTerm); //return the matched logs if there is a search query
-            } else {
-              $scope.logs = $log.getLogs(namespaces, levels);
+              searchTerms.push($scope.searchTerm);
             }
+
+            $scope.logs = $log.getLogs(namespaces, levels, searchTerms);
 
             if (hasLocalStorage) {
               localStorage.setItem('activeNamespaces', JSON.stringify($scope.activeNamespaces));
@@ -56,42 +57,37 @@ application.directive('debugger', ['$log', '$timeout', function($log, $timeout) 
           }
         }
 
-        if ($log.datastore) {
-          $log.datastore.settings({
-            'onInsert' : function() {
-              $scope.namespaces = $log.getNamespaces();
-              $scope.levels = $log.dbEnabled;
-              updateLogs();
+        // if ($log.datastore) {
+        //   $log.datastore.settings({
+        //     'onInsert' : function() {
+        //       $scope.namespaces = $log.getNamespaces();
+        //       $scope.levels = $log.dbEnabled;
+        //       updateLogs();
 
-              $('#newLogIndicator')
-                .removeClass()
-                .addClass(this.level)
-                .stop(true, true)
-                .fadeIn('fast')
-                .delay(750)
-                .fadeOut();
-            },
-            'onUpdate' : function() {
-              updateLogs();
-            },
-            'onRemove' : function() {
-              updateLogs();
-            }
-          });
-        }
+        //       $('#newLogIndicator')
+        //         .removeClass()
+        //         .addClass(this.level)
+        //         .stop(true, true)
+        //         .fadeIn('fast')
+        //         .delay(750)
+        //         .fadeOut();
+        //     },
+        //     'onUpdate' : function() {
+        //       updateLogs();
+        //     },
+        //     'onRemove' : function() {
+        //       updateLogs();
+        //     }
+        //   });
+        // }
 
         $scope.clear = function() {
-          var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
-          var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
-
-          $log.clear(namespaces, levels);
+          $log.clear();
+          updateLogs();
         };
 
         $scope.search = function() {
-          var namespaces = _.contains($scope.activeNamespaces, '_all') ? null : $scope.activeNamespaces;
-          var levels = _.contains($scope.activeLevels, '_all') ? null : $scope.activeLevels;
-
-          $scope.logs = $log.search(namespaces, levels, $scope.searchTerm);
+          updateLogs();
         };
 
         $scope.setActiveNamespace = function(namespace) {

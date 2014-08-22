@@ -11,6 +11,8 @@ module.exports = function(grunt) {
 
   var payloadFiles = [
     'src/fn.logger.js',
+    'src/storageAdapters/logDB.js',
+    'src/config.js',
     'src/cycle.js',
     'src/logger/debugger.js',
     'fn.logger.templates.js',
