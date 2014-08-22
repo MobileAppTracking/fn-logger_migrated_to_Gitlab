@@ -17,6 +17,13 @@
             currentQuery = query;
             results = _.filter(this.db, function(record) {
                 for (var key in query) {
+                    if (key == "message") {
+                        value = record[key].toLowerCase();
+                        searchValue = query[key].toLowerCase();
+                        if (value.search(searchValue) > -1) {
+                            return true;
+                        }
+                    }
                     if (!_.contains(query[key], record[key])) {
                         return false;
                     }
@@ -362,9 +369,9 @@
                     $timeout(function() {
                         var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
                         var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
-                        var searchTerms = [];
+                        var searchTerms = null;
                         if ($scope.searchTerm) {
-                            searchTerms.push($scope.searchTerm);
+                            searchTerms = $scope.searchTerm;
                         }
                         $scope.logs = $log.getLogs(namespaces, levels, searchTerms);
                         if (hasLocalStorage) {

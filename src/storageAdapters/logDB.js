@@ -41,6 +41,14 @@ angular.module('fn.logger').provider('logDB', function() {
     currentQuery = query;
     results =  _.filter(this.db, function(record) {
       for (var key in query) {
+        if (key == 'message') {
+          value = record[key].toLowerCase();
+          searchValue = query[key].toLowerCase();
+          if (value.search(searchValue) > -1) {
+            return true;
+          }
+        }
+
         if (!_.contains(query[key], record[key])) {
           return false;
         }
