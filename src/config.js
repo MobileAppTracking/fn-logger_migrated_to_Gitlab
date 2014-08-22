@@ -2,12 +2,27 @@
  * @method $log
  * Enhance native AngularJS $log service, now with namespaces.
  *
- * Overrides default angular behavior - adds new TaffyDB powered database for storing, querying and sorting logs
+ * Overrides default angular behavior - adds the database for storing, querying and sorting logs
  * You can enabled only certain log levels by setting `$log.consoleEnabled` and `$log.dbEnabled`.
  * They both contain an array of what log levels will be stored/reported. Possible values are
  * `['error', 'info', 'warn', 'log']`.
  *
  * Also injects `$log` as the default implementation for console.{log|warn|info|error} methods
+ *
+ * The `logDB` provider provides a service for logs storage as default
+ * You can override the default storage provider - uses other databases (e.g. TaffyDB) for storage mechanism
+ *
+ * Example:
+ *
+ *     // decorate the logDB provider with TaffyDB database
+ *     $provider.decorator('logDBProvider', ['$delegate', function($delegate) {
+ *       $delegate.db = new TaffyDB();
+ *
+ *       // override the create method of logDB
+ *       $delegate.create = function (record) {
+ *         return taffyDB.insert(record);
+ *       }
+ *     }]);
  *
  * The `<debugger>` directive provides a sample interface for retrieving and displaying information from `$log`.
  *

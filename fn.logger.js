@@ -2,16 +2,16 @@
     global["true"] = exports;
     var application = angular.module("fn.logger", []);
     angular.module("fn.logger").provider("logDB", function() {
-        var db = [];
+        this.db = [];
         var results = [];
         var self = this;
         this.init = angular.noop();
         this.create = function(record) {
-            db.push(record);
+            this.db.push(record);
             return true;
         };
         this.read = function(query) {
-            results = _.filter(db, function(record) {
+            results = _.filter(this.db, function(record) {
                 for (var key in query) {
                     if (!_.contains(query[key], record[key])) {
                         return false;
@@ -23,7 +23,7 @@
             return results;
         };
         this.update = function(id, payload) {
-            _.each(db, function(record) {
+            _.each(this.db, function(record) {
                 if (record.id == id) {
                     record = _.extend(record, payload);
                 }
@@ -32,12 +32,12 @@
         };
         this.delete = function() {
             _.each(results, function(result) {
-                db.splice(_.indexOf(db, result), 1);
+                this.db.splice(_.indexOf(this.db, result), 1);
             });
             return true;
         };
         this.getNameSpaces = function() {
-            var values = _.pluck(db, "namespace");
+            var values = _.pluck(this.db, "namespace");
             return _.uniq(values);
         };
         this.$get = function() {
