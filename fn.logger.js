@@ -20,7 +20,7 @@
                     if (key == "message") {
                         value = record[key].toLowerCase();
                         searchValue = query[key].toLowerCase();
-                        if (value.search(searchValue) > -1) {
+                        if (value.indexOf(searchValue) > -1) {
                             return true;
                         }
                     }
@@ -369,10 +369,7 @@
                     $timeout(function() {
                         var namespaces = _.contains($scope.activeNamespaces, "_all") ? null : $scope.activeNamespaces;
                         var levels = _.contains($scope.activeLevels, "_all") ? null : $scope.activeLevels;
-                        var searchTerms = null;
-                        if ($scope.searchTerm) {
-                            searchTerms = $scope.searchTerm;
-                        }
+                        var searchTerms = $scope.searchTerm || null;
                         $scope.logs = $log.getLogs(namespaces, levels, searchTerms);
                         if (hasLocalStorage) {
                             localStorage.setItem("activeNamespaces", JSON.stringify($scope.activeNamespaces));

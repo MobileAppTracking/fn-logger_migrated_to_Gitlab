@@ -44,7 +44,7 @@ angular.module('fn.logger').provider('logDB', function() {
         if (key == 'message') {
           value = record[key].toLowerCase();
           searchValue = query[key].toLowerCase();
-          if (value.search(searchValue) > -1) {
+          if (value.indexOf(searchValue) > -1) {
             return true;
           }
         }
