@@ -5,8 +5,8 @@
 
 angular.module('fn.logger').provider('logDB', function() {
   this.db = [];
-  var results = [];
-  var self = this;
+  var currentResults = [];
+  var prevResults = [];
 
   /*
    * set storage configuration
@@ -23,6 +23,18 @@ angular.module('fn.logger').provider('logDB', function() {
 
   this.create = function(record) {
     this.db.push(record);
+
+    if (currentResults.length == 0) {
+      var activeNameSpaces = _.pluck(prevResults, 'namespace');
+      var activeLevels = _.pluck(prevResults, 'level');
+    } else {
+      activeNameSpaces = _.pluck(currentResults, 'namespace');
+      activeLevels = _.pluck(currentResults, 'level');
+    }
+
+    if (_.contains(activeNameSpaces, record.namespace) && _.contains(activeLevels, record.level)) {
+      currentResults.push(record);
+    }
     return true;
   }
 
@@ -34,7 +46,7 @@ angular.module('fn.logger').provider('logDB', function() {
    */
 
   this.read = function(query) {
-    results =  _.filter(this.db, function(record) {
+    currentResults =  _.filter(this.db, function(record) {
       for (var key in query) {
         if (!_.contains(query[key], record[key])) {
           return false;
@@ -43,8 +55,8 @@ angular.module('fn.logger').provider('logDB', function() {
       return true;
     });
 
-    results = _.sortBy(results, 'time');
-    return results;
+    currentResults = _.sortBy(currentResults, 'time');
+    return currentResults;
   }
 
   /*
@@ -71,8 +83,10 @@ angular.module('fn.logger').provider('logDB', function() {
    */
 
   this.delete = function() {
-    _.each (results, function(result) {
-      this.db.splice(_.indexOf(this.db, result), 1);
+    var db = this.db;
+    prevResults = _.clone(currentResults); //save the results before deleting
+    _.each (currentResults, function(result) {
+      db.splice(_.indexOf(db, result), 1);
     });
 
     return true;
@@ -90,7 +104,7 @@ angular.module('fn.logger').provider('logDB', function() {
   }
 
   this.$get = function() {
-    return self;
+    return this;
   }
 
 });

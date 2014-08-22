@@ -3,15 +3,25 @@
     var application = angular.module("fn.logger", []);
     angular.module("fn.logger").provider("logDB", function() {
         this.db = [];
-        var results = [];
-        var self = this;
+        var currentResults = [];
+        var prevResults = [];
         this.init = angular.noop();
         this.create = function(record) {
             this.db.push(record);
+            if (currentResults.length == 0) {
+                var activeNameSpaces = _.pluck(prevResults, "namespace");
+                var activeLevels = _.pluck(prevResults, "level");
+            } else {
+                activeNameSpaces = _.pluck(currentResults, "namespace");
+                activeLevels = _.pluck(currentResults, "level");
+            }
+            if (_.contains(activeNameSpaces, record.namespace) && _.contains(activeLevels, record.level)) {
+                currentResults.push(record);
+            }
             return true;
         };
         this.read = function(query) {
-            results = _.filter(this.db, function(record) {
+            currentResults = _.filter(this.db, function(record) {
                 for (var key in query) {
                     if (!_.contains(query[key], record[key])) {
                         return false;
@@ -19,8 +29,8 @@
                 }
                 return true;
             });
-            results = _.sortBy(results, "time");
-            return results;
+            currentResults = _.sortBy(currentResults, "time");
+            return currentResults;
         };
         this.update = function(id, payload) {
             _.each(this.db, function(record) {
@@ -31,8 +41,10 @@
             return true;
         };
         this.delete = function() {
-            _.each(results, function(result) {
-                this.db.splice(_.indexOf(this.db, result), 1);
+            var db = this.db;
+            prevResults = _.clone(currentResults);
+            _.each(currentResults, function(result) {
+                db.splice(_.indexOf(db, result), 1);
             });
             return true;
         };
@@ -41,7 +53,7 @@
             return _.uniq(values);
         };
         this.$get = function() {
-            return self;
+            return this;
         };
     });
     angular.module("fn.logger").config([ "$provide", "logDBProvider", function($provide, logDBProvider) {
@@ -58,26 +70,27 @@
                 warn: console.warn,
                 log: console.log
             };
+            var logLevels = [ "error", "info", "warn", "log" ];
             var _id = 0;
             var generateId = function() {
                 return _id++;
             };
             $delegate.interceptConsole = function interceptConsole() {
-                _.each([ "error", "info", "warn", "log" ], function(level) {
+                _.each(logLevels, function(level) {
                     console[level] = function fnConsoleLogger() {
                         $delegate[level].apply($delegate, _.union([ "console" ], _.toArray(arguments)));
                     };
                 });
             };
             $delegate.stopInterceptingConsole = function stopInterceptingConsole() {
-                _.each([ "error", "info", "warn", "log" ], function(level) {
+                _.each(logLevels, function(level) {
                     console[level] = function() {
                         _old[level].apply(console, arguments);
                     };
                 });
             };
-            $delegate.consoleEnabled = [ "error", "info", "warn", "log" ];
-            $delegate.dbEnabled = [ "error", "info", "warn", "log" ];
+            $delegate.consoleEnabled = _.clone(logLevels);
+            $delegate.dbEnabled = _.clone(logLevels);
             $delegate.datastore = logDBProvider;
             var formatError = function(arg) {
                 if (arg instanceof Error) {
@@ -154,7 +167,7 @@
                 });
                 return data;
             };
-            _.each([ "error", "info", "warn", "log" ], function(level) {
+            _.each(logLevels, function(level) {
                 $delegate[level] = function fnLogger(namespace, message) {
                     var args = _.toArray(arguments);
                     var hasjQuery = false;

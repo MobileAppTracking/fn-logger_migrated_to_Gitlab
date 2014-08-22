@@ -55,13 +55,14 @@ angular.module('fn.logger').config(['$provide', 'logDBProvider', function($provi
       'log'   : console.log
     };
 
+    var logLevels = ['error', 'info', 'warn', 'log'];
     var _id = 0;
     var generateId = function () {
       return _id++;
     };
 
     $delegate.interceptConsole = function interceptConsole() {
-      _.each(['error', 'info', 'warn', 'log'], function(level) {
+      _.each(logLevels, function(level) {
         console[level] = function fnConsoleLogger() {
           $delegate[level].apply($delegate, _.union(['console'], _.toArray(arguments)));
         };
@@ -69,15 +70,15 @@ angular.module('fn.logger').config(['$provide', 'logDBProvider', function($provi
     };
 
     $delegate.stopInterceptingConsole = function stopInterceptingConsole() {
-      _.each(['error', 'info', 'warn', 'log'], function(level) {
+      _.each(logLevels, function(level) {
         console[level] = function() {
           _old[level].apply(console, arguments);
         };
       });
     };
 
-    $delegate.consoleEnabled = ['error', 'info', 'warn', 'log'];
-    $delegate.dbEnabled = ['error', 'info', 'warn', 'log'];
+    $delegate.consoleEnabled = _.clone(logLevels);
+    $delegate.dbEnabled = _.clone(logLevels);
     $delegate.datastore = logDBProvider;
 
     var formatError = function(arg) {
@@ -172,7 +173,7 @@ angular.module('fn.logger').config(['$provide', 'logDBProvider', function($provi
       return data;
     };
 
-    _.each(['error', 'info', 'warn', 'log'], function(level) {
+    _.each(logLevels, function(level) {
       $delegate[level] = function fnLogger(namespace, message) {
         var args = _.toArray(arguments);
         var hasjQuery = false;
