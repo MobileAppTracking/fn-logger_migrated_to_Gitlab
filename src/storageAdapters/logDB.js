@@ -48,7 +48,6 @@ angular.module('fn.logger').provider('logDB', function() {
             return true;
           }
         }
-
         if (!_.contains(query[key], record[key])) {
           return false;
         }

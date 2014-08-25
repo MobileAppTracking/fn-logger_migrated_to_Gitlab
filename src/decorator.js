@@ -12,18 +12,6 @@
  * The `logDB` provider provides a service for logs storage as default
  * You can override the default storage provider - uses other databases (e.g. TaffyDB) for storage mechanism
  *
- * Example:
- *
- *     // decorate the logDB provider with TaffyDB database
- *     $provider.decorator('logDBProvider', ['$delegate', function($delegate) {
- *       $delegate.db = new TaffyDB();
- *
- *       // override the create method of logDB
- *       $delegate.create = function (record) {
- *         return taffyDB.insert(record);
- *       }
- *     }]);
- *
  * The `<debugger>` directive provides a sample interface for retrieving and displaying information from `$log`.
  *
  * Example:
@@ -36,6 +24,7 @@
  *
  *     // Calls to console.{log|warn|info|error} will be logged to the console namespace
  *     console.log('hello world');
+ *
  *
  */
 angular.module('fn.logger').config(['$provide', 'logDBProvider', function($provide, logDBProvider) {
