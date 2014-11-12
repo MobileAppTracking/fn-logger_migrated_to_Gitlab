@@ -35,7 +35,8 @@
 #debugger li,
 #debugger h3,
 #debugger code,
-#debugger span {
+#debugger span,
+#debugger input {
   margin: 0;
   padding: 0;
   font-size: 13px;
@@ -409,8 +410,10 @@
 
 #debugger .level-filter li.search-data > input {
   border-radius: 4px;
-  height: 17px;
+  font-size: 13px;
+  height: 23px;
   outline: 0;
+  padding: 1px 5px;
 }
 
 #debugger .level-filter li.clear-data:hover {
