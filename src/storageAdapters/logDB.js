@@ -22,10 +22,10 @@ angular.module('fn.logger').provider('logDB', function() {
    */
 
   this.create = function(record) {
-    this.db.push(record);
+    this.db.unshift(record);
 
     if (_.isEmpty(currentQuery) || _.contains(currentQuery.namespace, record.namespace) || _.contains(currentQuery.level, record.level)) {
-      results.push(record);
+      results.unshift(record);
     }
     return true;
   }
@@ -56,6 +56,7 @@ angular.module('fn.logger').provider('logDB', function() {
     });
 
     results = _.sortBy(results, 'time');
+    results.reverse();
     return results;
   }
 
