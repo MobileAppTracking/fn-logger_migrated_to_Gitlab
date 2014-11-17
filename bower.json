@@ -1,6 +1,6 @@
 {
   "name": "fn-logger",
-  "version": "0.5.1",
+  "version": "0.5.4",
   "authors": [
     "Josh Schumacher <joshs@hasoffers.com>",
     "Jack Morgan <jack@hasoffers.com>"
@@ -30,7 +30,7 @@
     "lodash": "~2.2.1"
   },
   "devDependencies": {
-    "angular-mocks": "1.2.0-rc.3",
+    "angular-mocks": "~1.3",
     "chai": "~1.8.1"
   },
   "resolutions": {
